@@ -1,7 +1,8 @@
-name := "scala"
+ThisBuild / scalaVersion := "2.13.8"
+ThisBuild / organization := "com.example"
 
-version := "0.1"
-
-scalaVersion := "2.13.8"
-
-libraryDependencies += "org.scalatest" %% "scalatest-funsuite" % "3.2.12" % "test"
+lazy val fpInScala = (project in file("."))
+  .settings(
+    name := "FpInScala",
+    libraryDependencies += "org.scalatest" %% "scalatest-funsuite" % "3.2.16" % "test"
+  )
