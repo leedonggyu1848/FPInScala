@@ -1,7 +1,7 @@
 import org.scalatest.funsuite.AnyFunSuite
 
 class MyOptionTest extends AnyFunSuite {
-  def fixtures = new {
+  private def fixtures = new {
     val some:MySome[Int] = MySome(10)
     val none: MyOption[Nothing] = MyNone
   }

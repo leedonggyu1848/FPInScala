@@ -149,7 +149,7 @@ object MyList {
 
   // 3.24
   @tailrec
-  def isStartedWith[A](sup: MyList[A], sub: MyList[A]): Boolean = (sup, sub) match {
+  private def isStartedWith[A](sup: MyList[A], sub: MyList[A]): Boolean = (sup, sub) match {
     case (_, MyNil) => true
     case (MyCons(h1, t1), MyCons(h2, t2)) if h1 == h2 => isStartedWith(t1, t2)
     case _ => false

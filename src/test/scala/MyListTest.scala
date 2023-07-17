@@ -1,12 +1,28 @@
 import org.scalatest.funsuite.AnyFunSuite
 
-class MyListTest extends AnyFunSuite{
+class MyListTest extends AnyFunSuite {
 
   private def fixtures = new {
     val fiveElements: MyList[Int] = MyList(1,2,3,4,5)
     val oneElement: MyList[Int] = MyList(1)
     val myNil: MyList[Nothing] = MyList()
   }
+
+  test("sum test") {
+    assert(MyList.sum(fixtures.fiveElements) == 15)
+    assert(MyList.sum(fixtures.oneElement) == 1)
+    assert(MyList.sum(fixtures.myNil) == 0)
+  }
+
+  test("product test") {
+    val doubleTypeElements: MyList[Double] = MyList(1,2,3)
+    val doubleTypeElement: MyList[Double] = MyList(2)
+
+    assert(MyList.product(doubleTypeElements) == 6.0)
+    assert(MyList.product(doubleTypeElement) == 2.0)
+    assert(MyList.product(fixtures.myNil) == 1.0)
+  }
+
   test("3.2 tail test") {
     assert(MyList.tail(fixtures.fiveElements) == MyList(2,3,4,5))
     assert(MyList.tail(fixtures.oneElement) == MyNil)
