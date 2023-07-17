@@ -11,6 +11,21 @@ sealed trait MyStream[+A] {
     case MyCons(h, t) => Some(h())
   }
 
+  def drop(n: Int): MyStream[A] = this match {
+    case MyCons(_, t) if n > 0 => t().drop(n - 1)
+    case _ => this
+  }
+
+  def foldRight[B](z: => B)(f : (A, => B) => B): B = {
+    this match {
+      case MyCons(h, t) => f(h(), t().foldRight(z)(f))
+      case _ => z
+    }
+  }
+
+  def exists(p: A => Boolean): Boolean =
+    foldRight(false)((a, b) => p(a) || b)
+
   // 5.1
   def toList: List[A] = this match {
     case MyEmpty => Nil
@@ -24,10 +39,26 @@ sealed trait MyStream[+A] {
     case _ => empty
   }
 
-  def drop(n: Int): MyStream[A] = this match {
-    case MyCons(_, t) if n > 0 => t().drop(n-1)
-    case _ => this
+  // 5.3
+  def takeWhile(p: A => Boolean): MyStream[A] = this match {
+    case MyCons(h, t) if p(h()) => cons(h(), t().takeWhile(p))
+    case _ => empty
   }
+
+  // 5.4
+  def forAll(p: A => Boolean): Boolean =
+    foldRight(true)((a, b) => p(a) && b)
+
+  // 5.5
+  def takeWhileV2(p: A => Boolean): MyStream[A] =
+    foldRight(empty: MyStream[A])((a, b) => if (p(a)) cons(a, b) else empty)
+
+  // 5.6
+  def headOptionV2: Option[A] =
+    foldRight(None: Option[A])((a, _) => Some(a))
+
+  // 5.7
+  // TODO: map, filter, append, flatMap
 }
 
 object MyStream {
