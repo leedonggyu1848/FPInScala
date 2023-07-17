@@ -19,12 +19,13 @@ sealed trait MyEither[+E, +A] {
     this.flatMap(x => b.map(y => f(x, y)))
 }
 case class MyLeft[+E](value: E) extends MyEither[E, Nothing]
-case class MyRight[+E](value: E) extends MyEither[Nothing, E]
+case class MyRight[+A](value: A) extends MyEither[Nothing, A]
 
 object MyEither {
   def Try[A](a: => A): MyEither[Exception, A] =
     try MyRight(a)
     catch { case e: Exception => MyLeft(e)}
+
   //4.7
   def traverse[E, A, B](es: List[A])(f: A => MyEither[E, B]): MyEither[E, List[B]] =
     es.foldRight[MyEither[E, List[B]]](MyRight(Nil))((x,z) => f(x).map2(z)(_ :: _))
