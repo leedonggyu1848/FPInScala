@@ -2,6 +2,8 @@ package stream
 
 import stream.MyStream.{cons, empty}
 
+import scala.annotation.tailrec
+
 case object MyEmpty extends MyStream[Nothing]
 case class MyCons[+A](h: () => A, t: () => MyStream[A]) extends MyStream[A]
 
@@ -57,7 +59,7 @@ sealed trait MyStream[+A] {
   def headOptionV2: Option[A] =
     foldRight(None: Option[A])((a, _) => Some(a))
 
-  // 5.7
+  // 5.7 begin
   def map[B](f: A => B): MyStream[B] =
     foldRight(empty[B])((e, acc) => cons(f(e), acc))
 
@@ -69,6 +71,10 @@ sealed trait MyStream[+A] {
 
   def flatMap[B](f: A => MyStream[B]): MyStream[B] =
     foldRight(empty[B])((e, acc) => f(e).append(acc))
+  // 5.7 end
+
+  def find(p: A => Boolean): Option[A] =
+    filter(p).headOption
 }
 
 object MyStream {
@@ -80,6 +86,59 @@ object MyStream {
 
   def empty[A]: MyStream[A] = MyEmpty
 
+  // 5.8
+  def constant[A](a: A): MyStream[A] =
+    cons(a, constant(a))
+
+  // 5.9
+  def from(n: Int): MyStream[Int] =
+    cons(n, from(n + 1))
+
   def apply[A](as: A*): MyStream[A] =
     if (as.isEmpty) empty else cons(as.head, apply(as.tail: _*))
+
+  // 5.10
+  def fibs: MyStream[Int] = {
+    def inner(cur: Int, next: Int): MyStream[Int] =
+      cons(cur, inner(next, cur + next))
+
+    inner(0, 1)
+  }
+
+  // 5.11
+  def unfold[A, S](z: S)(f: S => Option[(A, S)]): MyStream[A] =
+    f(z) match {
+      case Some((a, s)) => cons(a, unfold(s)(f))
+      case None => empty
+    }
+
+  // 5.12 begin
+  def fibsViaUnfold: MyStream[Int] =
+    unfold((0, 1)) {
+      case (cur, next) =>
+        Some((cur, (next, cur + next)))
+    }
+
+  def fromViaUnfold(n: Int): MyStream[Int] =
+    unfold(n)(e => Some((e, e + 1)))
+
+  def constantViaUnfold[A](a: A): MyStream[A] =
+    unfold(a)(_ => Some(a, a))
+
+  def onesViaUnfold: MyStream[Int] =
+    unfold(1)(_ => Some(1, 1))
+  // 5.12 end
+
+  // 5.13 start
+  // TODO: with unfold
+  //  1. map
+  //  2. take
+  //  3. zipWith
+  //  4. zipAll
+  // 5.13 end
+
+  // 5.14 TODO: startsWith
+  // 5.15 TODO: tails with unfold
+  // 5.16 TODO: scanRight
 }
+
