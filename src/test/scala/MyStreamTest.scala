@@ -38,4 +38,26 @@ class MyStreamTest extends AnyFunSuite{
     assert(MyStream(1).headOptionV2.contains(1))
     assert(MyStream().headOptionV2.isEmpty)
   }
+
+  test("5.7 map test") {
+    assert(MyStream(1,2,3).map(_ + 1).toList == List(2,3,4))
+    assert(MyStream.empty[Int].map(_ + 1) == MyStream.empty)
+  }
+
+  test("5.7 filter test") {
+    assert(MyStream(1,2,3,4,5).filter(_ % 2 == 0).toList == List(2,4))
+    assert(MyStream(1,2,3,4,5).filter(_ % 2 == 1).toList == List(1,3,5))
+    assert(MyStream.empty[Int].map(_ => true) == MyStream.empty)
+  }
+
+  test("5.7 append test") {
+    assert(MyStream(1,2,3).append(MyStream(4,5,6)).toList == List(1,2,3,4,5,6))
+    assert(MyStream.empty.append(MyStream(1,2,3)).toList == List(1,2,3))
+    assert(MyStream(1,2,3).append(MyStream.empty).toList == List(1,2,3))
+  }
+
+  test("5.7 flatMap test") {
+    assert(MyStream(1,2,3,4,5).flatMap(e => MyStream(e + 1)).toList == List(2,3,4,5,6))
+    assert(MyStream.empty[Int].flatMap(e => MyStream(e + 1))== MyStream.empty)
+  }
 }

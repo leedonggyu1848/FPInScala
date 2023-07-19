@@ -58,7 +58,17 @@ sealed trait MyStream[+A] {
     foldRight(None: Option[A])((a, _) => Some(a))
 
   // 5.7
-  // TODO: map, filter, append, flatMap
+  def map[B](f: A => B): MyStream[B] =
+    foldRight(empty[B])((e, acc) => cons(f(e), acc))
+
+  def filter(f: A => Boolean): MyStream[A] =
+    foldRight(empty[A])((e, acc) => if(f(e)) cons(e, acc) else acc)
+
+  def append[A2 >: A](as: => MyStream[A2]): MyStream[A2] =
+    foldRight(as)((e, acc) => cons(e, acc))
+
+  def flatMap[B](f: A => MyStream[B]): MyStream[B] =
+    foldRight(empty[B])((e, acc) => f(e).append(acc))
 }
 
 object MyStream {
