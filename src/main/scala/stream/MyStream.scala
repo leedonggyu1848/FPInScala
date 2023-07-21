@@ -130,13 +130,34 @@ object MyStream {
   // 5.12 end
 
   // 5.13 start
-  // TODO: with unfold
-  //  1. map
-  //  2. take
-  //  3. zipWith
-  //  4. zipAll
-  // 5.13 end
+  def mapViaUnfold[A, B](s: MyStream[A])(f: A => B): MyStream[B] =
+    unfold(s) {
+      case MyCons(h, t) => Some((f(h()), t()))
+      case _ => None
+    }
 
+  def takeViaUnfold[A](s: MyStream[A])(n: Int): MyStream[A] =
+    unfold((s, n)) {
+      case (MyCons(h, t), n) if n > 0 => Some((h(), (t(), n - 1)))
+      case _ => None
+    }
+
+  def zipWithViaUnfold[A, B, C](s1: MyStream[A], s2: MyStream[B])(f: (A, B) => C): MyStream[C] =
+    unfold((s1, s2)) {
+      case (MyCons(h1, t1), MyCons(h2, t2)) => Some((f(h1(), h2()), (t1(), t2())))
+      case _ => None
+    }
+
+  def zipAllViaUnfold[A, B](s1: MyStream[A], s2:MyStream[B]): MyStream[(Option[A], Option[B])] = {
+    unfold((s1, s2)) {
+      case (MyEmpty, MyEmpty) => None
+      case (MyEmpty, MyCons(h, t)) => Some((None, Some(h())), (MyEmpty, t()))
+      case (MyCons(h, t), MyEmpty) => Some((Some(h()), None), (t(), MyEmpty))
+      case (MyCons(h1, t1), MyCons(h2, t2)) => Some((Some(h1()), Some(h2())), (t1(), t2()))
+    }
+  }
+
+  // 5.13 end
   // 5.14 TODO: startsWith
   // 5.15 TODO: tails with unfold
   // 5.16 TODO: scanRight

@@ -3,6 +3,7 @@ import stream.MyStream
 
 import scala.List
 import scala.collection.IterableOnce.iterableOnceExtensionMethods
+import scala.collection.View.Empty
 
 class MyStreamTest extends AnyFunSuite {
   test("5.1 toList") {
@@ -95,5 +96,60 @@ class MyStreamTest extends AnyFunSuite {
 
   test("5.12 onesViaUnfold") {
     assert(MyStream.onesViaUnfold.take(10).toList.size == 10)
+  }
+
+  test("5.13 mapViaUnfold") {
+    assert(MyStream.mapViaUnfold(MyStream(1, 2, 3))(_ + 1).toList == List(2, 3, 4))
+    assert(MyStream.mapViaUnfold(MyStream.empty[Int])(_ + 1).toList == List.empty)
+  }
+
+  test("5.13 takeViaUnfold") {
+    assert(MyStream.takeViaUnfold(MyStream(1, 2, 3, 4, 5))(3).toList == List(1, 2, 3))
+    assert(MyStream.takeViaUnfold(MyStream(1, 2, 3, 4, 5))(0).toList == List.empty)
+    assert(MyStream.takeViaUnfold(MyStream())(10).toList == List.empty)
+  }
+
+  test("5.13 zipWithViaUnfold") {
+    assert(MyStream.zipWithViaUnfold
+    (MyStream(1, 2, 3, 4, 5), MyStream(1, 2, 3, 4, 5))
+    (_ + _).toList == List(2, 4, 6, 8, 10))
+
+    assert(MyStream.zipWithViaUnfold
+    (MyStream(1, 2, 3), MyStream(1, 2, 3, 4, 5))
+    (_ + _).toList == List(2, 4, 6))
+
+    assert(MyStream.zipWithViaUnfold
+    (MyStream(1, 2, 3, 4, 5), MyStream(1, 2, 3))
+    (_ + _).toList == List(2, 4, 6))
+
+    assert(MyStream.zipWithViaUnfold
+    (MyStream(1, 2, 3), MyStream.empty)
+    (_ + _).toList == List.empty)
+
+    assert(MyStream.zipWithViaUnfold
+    (MyStream(1, 2, 3), MyStream.empty)
+    (_ + _).toList == List.empty)
+  }
+
+  test("5.13 zipAllViaUnfold") {
+    val add: ((Option[Int], Option[Int]), => List[Int]) => List[Int] = (dt, acc) => {
+        dt match {
+          case (Some(a), Some(b)) => a + b :: acc
+          case (None, Some(b)) => b :: acc
+          case (Some(a), None) => a :: acc
+          case _ => acc
+        }
+      }
+    assert(MyStream.zipAllViaUnfold(MyStream(1, 2, 3), MyStream(1, 2, 3))
+      .foldRight(List.empty: List[Int])(add) == List(2, 4, 6))
+
+    assert(MyStream.zipAllViaUnfold(MyStream(1, 2), MyStream(1, 2, 3))
+      .foldRight(List.empty: List[Int])(add) == List(2, 4, 3))
+
+    assert(MyStream.zipAllViaUnfold(MyStream(1, 2, 3), MyStream(1, 2))
+      .foldRight(List.empty: List[Int])(add) == List(2, 4, 3))
+
+    assert(MyStream.zipAllViaUnfold(MyStream.empty, MyStream.empty)
+      .foldRight(List.empty: List[Int])(add) == List.empty)
   }
 }
