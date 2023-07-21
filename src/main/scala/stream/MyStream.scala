@@ -1,6 +1,6 @@
 package stream
 
-import stream.MyStream.{cons, empty, zipAllViaUnfold}
+import stream.MyStream.{cons, empty, unfold, zipAllViaUnfold}
 
 import scala.annotation.tailrec
 
@@ -76,13 +76,22 @@ sealed trait MyStream[+A] {
   def find(p: A => Boolean): Option[A] =
     filter(p).headOption
 
-  def startWith[B](s: MyStream[B]): Boolean = {
+  def startsWith[B>:A](s: MyStream[B]): Boolean = {
     zipAllViaUnfold(this, s) takeWhile {
       case (_, Some(_)) => true
       case _ => false
     } forAll {
       case (Some(a), Some(b)) if a == b => true
     }}
+
+  def tails: MyStream[MyStream[A]] =
+    unfold(this) {
+      case MyCons(h, t) => Some((MyCons(h, t), t()))
+      case _ => None
+    } append MyStream(MyStream.empty)
+
+  def hasSubsequence[B](s: MyStream[B]): Boolean =
+    tails exists (_ startsWith s)
 }
 
 object MyStream {
@@ -164,10 +173,5 @@ object MyStream {
       case (MyCons(h1, t1), MyCons(h2, t2)) => Some((Some(h1()), Some(h2())), (t1(), t2()))
     }
   }
-  // 5.13 end
-
-
-  // 5.15 TODO: tails with unfold
-  // 5.16 TODO: scanRight
 }
 

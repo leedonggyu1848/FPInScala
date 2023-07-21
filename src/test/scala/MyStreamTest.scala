@@ -154,6 +154,11 @@ class MyStreamTest extends AnyFunSuite {
   }
 
   test("5.14 startWith") {
-    assert(MyStream(1, 2, 3) startWith MyStream(1, 2))
+    assert(MyStream(1, 2, 3) startsWith MyStream(1, 2))
+  }
+
+  test("5.15 tails") {
+    assert(MyStream(1,2,3).tails.map(_.toList).toList
+      == List(List(1,2,3), List(2,3), List(3), List.empty))
   }
 }
