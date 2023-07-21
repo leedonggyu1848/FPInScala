@@ -1,6 +1,6 @@
 package stream
 
-import stream.MyStream.{cons, empty}
+import stream.MyStream.{cons, empty, zipAllViaUnfold}
 
 import scala.annotation.tailrec
 
@@ -18,7 +18,7 @@ sealed trait MyStream[+A] {
     case _ => this
   }
 
-  def foldRight[B](z: => B)(f : (A, => B) => B): B = {
+  def foldRight[B](z: => B)(f: (A, => B) => B): B = {
     this match {
       case MyCons(h, t) => f(h(), t().foldRight(z)(f))
       case _ => z
@@ -36,7 +36,7 @@ sealed trait MyStream[+A] {
 
   // 5.2
   def take(n: Int): MyStream[A] = this match {
-    case MyCons(h, t) if n > 1 => cons(h(), t().take(n-1))
+    case MyCons(h, t) if n > 1 => cons(h(), t().take(n - 1))
     case MyCons(h, _) if n == 1 => cons(h(), empty)
     case _ => empty
   }
@@ -64,7 +64,7 @@ sealed trait MyStream[+A] {
     foldRight(empty[B])((e, acc) => cons(f(e), acc))
 
   def filter(f: A => Boolean): MyStream[A] =
-    foldRight(empty[A])((e, acc) => if(f(e)) cons(e, acc) else acc)
+    foldRight(empty[A])((e, acc) => if (f(e)) cons(e, acc) else acc)
 
   def append[A2 >: A](as: => MyStream[A2]): MyStream[A2] =
     foldRight(as)((e, acc) => cons(e, acc))
@@ -75,6 +75,14 @@ sealed trait MyStream[+A] {
 
   def find(p: A => Boolean): Option[A] =
     filter(p).headOption
+
+  def startWith[B](s: MyStream[B]): Boolean = {
+    zipAllViaUnfold(this, s) takeWhile {
+      case (_, Some(_)) => true
+      case _ => false
+    } forAll {
+      case (Some(a), Some(b)) if a == b => true
+    }}
 }
 
 object MyStream {
@@ -156,9 +164,9 @@ object MyStream {
       case (MyCons(h1, t1), MyCons(h2, t2)) => Some((Some(h1()), Some(h2())), (t1(), t2()))
     }
   }
-
   // 5.13 end
-  // 5.14 TODO: startsWith
+
+
   // 5.15 TODO: tails with unfold
   // 5.16 TODO: scanRight
 }

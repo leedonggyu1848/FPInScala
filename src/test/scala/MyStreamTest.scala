@@ -152,4 +152,8 @@ class MyStreamTest extends AnyFunSuite {
     assert(MyStream.zipAllViaUnfold(MyStream.empty, MyStream.empty)
       .foldRight(List.empty: List[Int])(add) == List.empty)
   }
+
+  test("5.14 startWith") {
+    assert(MyStream(1, 2, 3) startWith MyStream(1, 2))
+  }
 }
