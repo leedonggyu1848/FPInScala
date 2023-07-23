@@ -17,8 +17,14 @@ case class SimpleRNG(seed: Long) extends RNG {
 
 object RNG {
   @tailrec
-  def nonNegativeInt(rng: RNG): (Int, RNG) = rng.nextInt match {
-    case (n, next) if n < 0 => nonNegativeInt(next)
-    case ret => ret
+  def nonNegativeInt(rng: RNG): (Int, RNG) = {
+    val (n, nextRng) = rng.nextInt
+    
+  }
+}
+
+  @tailrec
+  def double(rng: RNG): (Double, RNG) = rng.nextDouble match {
+    case (n, next)
   }
 }
