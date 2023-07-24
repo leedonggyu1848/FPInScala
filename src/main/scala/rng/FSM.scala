@@ -12,7 +12,6 @@ case class Machine(locked: Boolean, candies: Int, coins: Int) {
     case Turn if !locked && candies > 0 => Machine(locked = true, candies-1, coins)
     case _  => this
   }
-
 }
 
 object Machine {
@@ -20,13 +19,14 @@ object Machine {
     Machine(locked = true, n, 0)
   }
 
-  def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] = {
-    State(e => {
-      val s = inputs
-        .foldLeft[Machine](e)((acc, v) => acc.update(v))
-      (s.getInterest, s)
-    })
-  }
+  def update(input: Input)(m: Machine): Machine =
+    m.update(input)
+
+  def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] = for {
+    _ <- State.sequence(inputs map (State.modify[Machine] _ compose update))
+    s <- State.get
+  } yield (s.coins, s.candies)
+
 }
 
 /*

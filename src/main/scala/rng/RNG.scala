@@ -1,7 +1,6 @@
 package rng
 
 import rng.State.unit
-
 import scala.annotation.tailrec
 
 sealed trait RNG {
@@ -28,6 +27,7 @@ case class State[S,+A](run: S => (A,S)) {
       flatMap(e => unit(f(e)))
   def map2[B, C](state: State[S, B])(f: (A, B) => C): State[S, C] =
     flatMap(a => state.map(b => f(a, b)))
+
 }
 
 object State {
@@ -35,12 +35,19 @@ object State {
     State(state => (a, state))
   def sequence[S, A](states: List[State[S, A]]): State[S, List[A]] =
     states.foldRight(unit[S, List[A]](List.empty))((v, acc) => v.map2(acc)(_ :: _))
+
+  def get[S]: State[S, S] = State(s => (s, s))
+
+  def set[S](s: S): State[S, Unit] = State(_ => ((), s))
+
+  def modify[S](f: S => S): State[S, Unit] = for {
+    s <- get
+    _ <- set(f(s))
+  } yield ()
 }
 
 object RNG {
-  private type State[S,+A] = S => (A, S)
-  type Rand[+A] = State[RNG, A]
-
+  type Rand[+A] = RNG => (A, RNG)
   def unit[A](a: A): Rand[A] =
     rng => (a, rng)
 
