@@ -36,7 +36,25 @@ class MonoidTest extends AnyFunSuiteLike {
     assert(!Monoid.booleanAnd.op(false, false))
     assert(Monoid.booleanAnd.op(zero, true))
     assert(!Monoid.booleanAnd.op(zero, false))
+  }
 
+  test("option") {
+    val zero = Monoid.optionMonoid.zero;
+    assert(Monoid.optionMonoid.op(Option(1), Option(2)) == Option(1))
+    assert(Monoid.optionMonoid.op(Option(1), zero) == Option(1))
+    assert(Monoid.optionMonoid.op(zero, Option(1)) == Option(1))
+    assert(Monoid.optionMonoid.op(zero, zero) == zero)
+  }
+
+  test("endo") {
+    val zero = Monoid.endoMonoid[Int].zero;
+    val f1: Int => Int = a => a + 1
+    val f2: Int => Int = a => a * 2
+
+    assert(Monoid.endoMonoid.op(f1, f2)(2) == 5)
+    assert(Monoid.endoMonoid.op(f1, zero)(1) == 3)
+    assert(Monoid.endoMonoid.op(zero, f1)(1) == 3)
+    assert(Monoid.endoMonoid.op(zero, zero)(3) == 3)
   }
 
 }
