@@ -1,7 +1,7 @@
 import org.scalatest.funsuite.AnyFunSuite
 
 class MyEitherTest extends AnyFunSuite {
-  private def fixtures = new {
+  private object fixtures {
     val someMsg = "something msg"
   }
 

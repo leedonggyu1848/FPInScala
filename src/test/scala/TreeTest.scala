@@ -1,7 +1,7 @@
 import org.scalatest.funsuite.AnyFunSuite
 
 class TreeTest extends AnyFunSuite{
-  private def fixtures = new {
+  private object fixtures {
     val tree1: Branch[Int] = Branch(Leaf(1), Leaf(2))
     val tree2: Leaf[Int] = Leaf(1)
     val tree3: Branch[Int] = Branch(Branch(Leaf(1), Leaf(2)), Leaf(3))

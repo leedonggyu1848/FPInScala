@@ -1,4 +1,6 @@
-package api
+package api.thread
+
+import api.thread.{Callable, Future}
 
 import scala.concurrent.duration.TimeUnit
 

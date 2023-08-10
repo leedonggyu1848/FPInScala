@@ -122,13 +122,13 @@ class MyStreamTest extends AnyFunSuite {
     (MyStream(1, 2, 3, 4, 5), MyStream(1, 2, 3))
     (_ + _).toList == List(2, 4, 6))
 
-    assert(MyStream.zipWithViaUnfold
+    assert(MyStream.zipWithViaUnfold[Int, Int, Int]
     (MyStream(1, 2, 3), MyStream.empty)
-    (_ + _).toList == List.empty)
+    (_ + _).toList == List.empty[Int])
 
-    assert(MyStream.zipWithViaUnfold
+    assert(MyStream.zipWithViaUnfold[Int, Int, Int]
     (MyStream(1, 2, 3), MyStream.empty)
-    (_ + _).toList == List.empty)
+    (_ + _).toList == List.empty[Int])
   }
 
   test("5.13 zipAllViaUnfold") {

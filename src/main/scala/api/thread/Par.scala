@@ -1,4 +1,6 @@
-package api
+package api.thread
+
+import api.thread.{Callable, ExecutorService, Future}
 
 import java.util.concurrent.TimeUnit
 

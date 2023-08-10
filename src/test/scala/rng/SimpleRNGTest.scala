@@ -8,7 +8,7 @@ class SimpleRNGTest extends AnyFunSuiteLike {
     n #:: rngGenerator[A](nextRng)(func)
   }
 
-  private def fixed = new {
+  private object fixed {
     def defaultRng: RNG = SimpleRNG(100)
     def defaultGenerator[A]: (RNG.Rand[A]) => LazyList[A] = rngGenerator(defaultRng)
   }

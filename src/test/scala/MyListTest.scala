@@ -2,7 +2,7 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class MyListTest extends AnyFunSuite {
 
-  private def fixtures = new {
+  private object fixtures {
     val fiveElements: MyList[Int] = MyList(1,2,3,4,5)
     val oneElement: MyList[Int] = MyList(1)
     val myNil: MyList[Nothing] = MyList()
