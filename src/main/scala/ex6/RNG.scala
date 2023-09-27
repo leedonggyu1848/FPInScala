@@ -89,7 +89,7 @@ object RNG:
   // 6.7
   def sequence[A](fs: List[Rand[A]]): Rand[List[A]] =
     fs.foldRight(unit(List.empty[A]))((f, acc) => map2(f, acc)(_ :: _))
-    
+
   def intsViaSequence(count: Int): Rand[List[Int]] =
     sequence(List.fill(count)(int))
 
@@ -113,17 +113,28 @@ object RNG:
     flatMap(ra)(a => map(rb)(b => f(a, b)))
 
 type State[S, +A] = S => (A, S)
+
+extension[S, A] (run: State[S, A])
+  def flatMap[B](f: A => State[S, B]): State[S, B] = s =>
+    val (a, next) = run(s)
+    f(a)(next)
+
+  def map[B](f: A => B): State[S, B] =
+    flatMap(a => State.unit(f(a)))
+
+  def map2[B, C](rs: State[S, B])(f: (A, B) => C): State[S, C] =
+    flatMap(a => rs.map(b => f(a, b)))
+
+
 object State:
   def unit[S, A](a: A): State[S, A] =
     s => (a, s)
 
-  extension[S, A] (run: State[S, A])
-    def flatMap[B](f: A => State[S, B]): State[S, B] = s =>
-        val (a, next) = run(s)
-        f(a)(next)
-
-    def map[B](f: A => B): State[S, B] =
-      flatMap(a => unit(f(a)))
-
-    def map2[B, C](rs: State[S, B])(f: (A, B) => C): State[S, C] =
-      flatMap(a => rs.map(b => f(a, b)))
+  def get[S]: State[S, S] = s => (s, s)
+  def set[S](s: S): State[S, Unit] = _ => ((), s)
+  def sequence[S,A](fs: List[State[S, A]]): State[S, List[A]] =
+    fs.foldRight(unit[S, List[A]](List.empty))((f, acc) => f.map2(acc)(_ :: _))
+  def modify[S](f: S => S): State[S, Unit] = for {
+    s <- get
+    _ <- set(f(s))
+  } yield ()
