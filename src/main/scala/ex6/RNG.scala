@@ -11,7 +11,6 @@ object RNG:
       val n = (newSeed >>> 16).toInt
       (n, nextRNG)
 
-
   /**
    * 이것은 함수이다. RNG를 받아서 다음값 (A)와 다음 RNG를 반환한다.
    */
@@ -114,9 +113,11 @@ object RNG:
 
 type State[S, +A] = S => (A, S)
 
-extension[S, A] (run: State[S, A])
+extension[S, A] (underlying: State[S, A])
+  def run(s: S): (A, S) = underlying(s)
+
   def flatMap[B](f: A => State[S, B]): State[S, B] = s =>
-    val (a, next) = run(s)
+    val (a, next) = underlying(s)
     f(a)(next)
 
   def map[B](f: A => B): State[S, B] =
@@ -124,7 +125,6 @@ extension[S, A] (run: State[S, A])
 
   def map2[B, C](rs: State[S, B])(f: (A, B) => C): State[S, C] =
     flatMap(a => rs.map(b => f(a, b)))
-
 
 object State:
   def unit[S, A](a: A): State[S, A] =
@@ -138,3 +138,5 @@ object State:
     s <- get
     _ <- set(f(s))
   } yield ()
+
+  def apply[S, A](f: S => (A, S)): State[S, A] = f
