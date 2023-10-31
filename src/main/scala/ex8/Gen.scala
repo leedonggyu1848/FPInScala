@@ -2,34 +2,35 @@ package ex8
 
 import ex6.*
 
-type Gen[A] = State[RNG, A]
 
 object Gen:
   // 8.4
   def choose(start: Int, stopExclusive: Int): Gen[Int] =
-    RNG.nonNegativeInt.map(n => start + n % (stopExclusive - start))
+    Gen(State(RNG.nonNegativeInt).map(n => start + n % (stopExclusive - start)))
 
   // 8.5
   def unit[A](a: => A): Gen[A] =
-    State.unit(a)
+    Gen(State.unit(a))
     
   def boolean: Gen[Boolean] =
-    RNG.nonNegativeInt.map(n => n % 2 == 0)
+    Gen(State(RNG.nonNegativeInt).map(n => n % 2 == 0))
     
   def listOfN[A](n: Int, g: Gen[A]): Gen[List[A]] =
-    State.sequence(List.fill(n)(g))
+    Gen(State.sequence(List.fill(n)(g.sample)))
 
   // 8.7
-  def union[A](g1: Gen[A], g2: Gen[A]): Gen[A] = ???
+  def union[A](g1: Gen[A], g2: Gen[A]): Gen[A] =
+    boolean.flatMap(b => if b then g1 else g2)
 
   //8.8
-  def weighted[A](g1: (Gen[A], Double), g2: (Gen[A], Double)): Gen[A] = ???
+  def weighted[A](g1: (Gen[A], Double), g2: (Gen[A], Double)): Gen[A] =
+    Gen(State(RNG.double))
+      .flatMap(d => if d < g1._2 / (g1._2 + g2._2) then g1._1 else g2._1)
 
+case class Gen[+A](sample: State[RNG, A]):
   // 8.6
-  extension [A](g: Gen[A])
-    def flatMap[B](f: A => Gen[B]): Gen[B] = rng =>
-      val (a, nextRng) = g(rng)
-      f(a)(nextRng)
+  def flatMap[B](f: A => Gen[B]): Gen[B] =
+    Gen(sample.flatMap(a => f(a).sample))
 
-    def listOfN(size: Gen[Int]): Gen[List[A]] =
-      size.flatMap(e => Gen.listOfN(e, g))
+  def listOfN(size: Gen[Int]): Gen[List[A]] =
+    size flatMap (n => Gen.listOfN(n, this))

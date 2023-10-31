@@ -1,20 +1,20 @@
 package ex6
 
-sealed trait RNG:
+trait RNG:
   def nextInt: (Int, RNG)
 
 object RNG:
-  case class SimpleRNG(seed: Long) extends RNG:
+  case class Simple(seed: Long) extends RNG:
     override def nextInt: (Int, RNG) =
       val newSeed = (seed * 0x5DEECE66DL + 0xBL) & 0XFFFFFFFFFFFFL
-      val nextRNG = SimpleRNG(newSeed)
+      val nextRNG = Simple(newSeed)
       val n = (newSeed >>> 16).toInt
       (n, nextRNG)
 
   /**
    * 이것은 함수이다. RNG를 받아서 다음값 (A)와 다음 RNG를 반환한다.
    */
-  type Rand[+A] = State[RNG, A] // RNG => (A, RNG)
+  type Rand[+A] = RNG => (A, RNG)
   val int: Rand[Int] = _.nextInt
 
   /**
@@ -111,14 +111,12 @@ object RNG:
   def map2ViaFlatMap[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
     flatMap(ra)(a => map(rb)(b => f(a, b)))
 
-type State[S, +A] = S => (A, S)
 
-extension[S, A] (underlying: State[S, A])
-  def run(s: S): (A, S) = underlying(s)
+case class State[S, +A](run: S => (A, S)):
 
-  def flatMap[B](f: A => State[S, B]): State[S, B] = s =>
-    val (a, next) = underlying(s)
-    f(a)(next)
+  def flatMap[B](f: A => State[S, B]): State[S, B] = State(s =>
+    val (a, next) = run(s)
+    f(a).run(next))
 
   def map[B](f: A => B): State[S, B] =
     flatMap(a => State.unit(f(a)))
@@ -128,15 +126,16 @@ extension[S, A] (underlying: State[S, A])
 
 object State:
   def unit[S, A](a: A): State[S, A] =
-    s => (a, s)
+    State(s => (a, s))
 
-  def get[S]: State[S, S] = s => (s, s)
-  def set[S](s: S): State[S, Unit] = _ => ((), s)
+  def get[S]: State[S, S] =
+    State(s => (s, s))
+  def set[S](s: S): State[S, Unit] =
+    State(_ => ((), s))
   def sequence[S,A](fs: List[State[S, A]]): State[S, List[A]] =
     fs.foldRight(unit[S, List[A]](List.empty))((f, acc) => f.map2(acc)(_ :: _))
-  def modify[S](f: S => S): State[S, Unit] = for {
-    s <- get
-    _ <- set(f(s))
-  } yield ()
-
-  def apply[S, A](f: S => (A, S)): State[S, A] = f
+  def modify[S](f: S => S): State[S, Unit] =
+    for
+      s <- get
+      _ <- set(f(s))
+    yield ()

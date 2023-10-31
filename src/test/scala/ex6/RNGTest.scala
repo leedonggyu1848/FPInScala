@@ -1,6 +1,6 @@
 package ex6
 
-import ex6.RNG.{SimpleRNG, int, nonNegativeEven}
+import ex6.RNG.{Simple, int, nonNegativeEven}
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 
@@ -9,7 +9,7 @@ class RNGTest extends AnyFlatSpecLike with Matchers {
     val (n, nextRng) = func(rng)
     n #:: rngGenerator(nextRng)(func)
 
-  val defaultRng = SimpleRNG(42)
+  val defaultRng = Simple(42)
   def defaultGenerator[A] = rngGenerator[A](defaultRng)
 
 

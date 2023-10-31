@@ -1,7 +1,7 @@
 package ex8
 
 import ex6.RNG
-import ex6.RNG.{SimpleRNG, unit}
+import ex6.RNG.{Simple, unit}
 import ex8.Gen.*
 import org.scalatest.Assertion
 import org.scalatest.flatspec.AnyFlatSpecLike
@@ -9,14 +9,16 @@ import org.scalatest.matchers.should.Matchers
 
 def iterateCheck[A](gen: Gen[A])(f: A => Unit): Unit =
   val range = 1 to 1000
-  var rng: RNG = SimpleRNG(1)
+  var rng: RNG = Simple(1)
   range foreach { _ =>
-    gen(rng) match {
+    gen.sample.run(rng) match {
       case (i, nextRng) =>
         f(i)
         rng = nextRng
     }
   }
+
+//def generateList[A](gen: Gen[A])(f: A => Unit): List[A] =
 
 class GenTest extends AnyFlatSpecLike with Matchers {
   behavior of "choose"
@@ -37,10 +39,10 @@ class GenTest extends AnyFlatSpecLike with Matchers {
 
   behavior of "boolean"
   it should "return true or false" in {
-    var rng: RNG = SimpleRNG(1)
+    var rng: RNG = Simple(1)
 
-    1 to 100 map { e =>
-      Gen.boolean(rng) match {
+    1 to 100 map { _ =>
+      Gen.boolean.sample.run(rng) match {
         case (bool, nextRng) =>
           rng = nextRng
            bool
@@ -67,4 +69,23 @@ class GenTest extends AnyFlatSpecLike with Matchers {
     }
   }
 
+  behavior of "union"
+  it should "return gen that has same probability" in {
+    val gen1 = Gen.unit(1)
+    val gen2 = Gen.unit(2)
+
+    iterateCheck(Gen.union(gen1, gen2)) { e =>
+      e should (be (1) or be (2))
+    }
+  }
+
+  behavior of "weighted"
+  it should "return gen that has same probability" in {
+    val gen1 = Gen.unit(1)
+    val gen2 = Gen.unit(2)
+
+    iterateCheck(Gen.weighted((gen1, 1), (gen2, 1))) { e =>
+      e should (be (1) or be (2))
+    }
+  }
 }
