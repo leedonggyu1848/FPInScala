@@ -116,6 +116,34 @@ sealed class List<out A> {
         // 3.20
         fun <A> filterViaFlatMap(xs: List<A>, f: (A) -> Boolean): List<A> =
             flatMap(xs) { if (f(it)) List.of(it) else empty() }
+
+        // 3.21
+        fun addPairwise(a1: List<Int>, a2: List<Int>): List<Int> = when (a1) {
+            is Nil -> Nil
+            is Cons -> when (a2) {
+                is Nil -> Nil
+                is Cons -> Cons(a1.head + a2.head, addPairwise(a1.tail, a2.tail))
+            }
+        }
+
+        // 3.22
+        fun <A, B, C> zipWith(a1: List<A>, a2: List<B>, f: (A, B) -> C): List<C> = when (a1) {
+            is Nil -> Nil
+            is Cons -> when (a2) {
+                is Nil -> Nil
+                is Cons -> Cons(f(a1.head, a2.head), zipWith(a1.tail, a2.tail, f))
+            }
+        }
+
+        // 3.23
+        tailrec fun hasSubsequence(sup: List<Int>, sub: List<Int>): Boolean = when (sub) {
+            is Nil -> true
+            is Cons -> when (sup) {
+                is Nil -> false
+                is Cons -> if (sup.head == sub.head) hasSubsequence(sup.tail, sub.tail)
+                            else hasSubsequence(sup.tail, sub)
+            }
+        }
     }
 }
 
