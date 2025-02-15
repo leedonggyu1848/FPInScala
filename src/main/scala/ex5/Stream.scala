@@ -1,6 +1,6 @@
 package ex5
 
-import ex5.Stream.*
+import Stream.*
 
 enum Stream[+A]:
   case Cons(h: () => A, t: () => Stream[A])

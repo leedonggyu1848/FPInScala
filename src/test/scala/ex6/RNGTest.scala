@@ -1,5 +1,6 @@
 package ex6
 
+import ex6.RNG
 import ex6.RNG.{Simple, int, nonNegativeEven}
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers

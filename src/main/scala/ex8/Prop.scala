@@ -1,7 +1,7 @@
 package ex8
 
 import ex6.RNG
-import ex8.Prop.*
+import Prop.*
 import ex8.Gen.*
 
 import scala.annotation.targetName
@@ -39,7 +39,7 @@ object Prop:
 
 
   case class Prop(run: (TestCases, RNG) => Result):
-    def check: Either[(FailedCase, SuccessCount), SuccessCount] = ???
+    def check: ex4.Either[(FailedCase, SuccessCount), SuccessCount] = ???
 
     // 8.9
     @targetName("and") def &&(p: Prop): Prop = ???

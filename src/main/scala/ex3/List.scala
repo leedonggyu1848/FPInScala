@@ -2,9 +2,9 @@ package ex3
 
 import scala.annotation.tailrec
 
-enum List[+A]:
-  case Nil extends List[Nothing]
-  case Cons(head: A, tail: List[A])
+sealed trait List[+A]
+case object Nil extends List[Nothing]
+case class Cons[+A](head: A, tail: List[A]) extends List[A]
 
 object List:
   def sum(ints: List[Int]): Int = ints match
@@ -15,6 +15,13 @@ object List:
     case Nil => 1.0
     case Cons(0.0, _) => 0.0
     case Cons(x, xs) => x * product(xs)
+    
+  // we can generalize sum and product using foldRight
+  def sum2(ns: List[Int]): Int =
+    foldRight(ns, 0)(_ + _)
+    
+  def product2(ns: List[Double]): Double =
+    foldRight(ns, 1.0)(_ * _)
 
   def apply[A](as: A*): List[A] =
     if as.isEmpty then Nil
@@ -50,6 +57,12 @@ object List:
   def dropWhile[A](l: List[A], f: A => Boolean): List[A] = l match
     case Cons(h, t) => if f(h) then dropWhile(t, f) else l
     case Nil => Nil
+
+  // curring version of dropWhile (Type annotation is not necessary)
+  // You can omit the type annotation by currying the same type.
+  def curryingDropWhile[A](as: List[A])(f: A => Boolean): List[A] = as match
+    case Cons(h, t) if f(h) => curryingDropWhile(t)(f)
+    case _ => as
 
   // ex 3.6
   def init[A](l: List[A]): List[A] = l match

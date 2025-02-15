@@ -5,7 +5,7 @@ import org.scalatest.matchers.should.Matchers
 import ex4.Either.{Left, Right}
 
 class EitherTest extends AnyFlatSpecLike with Matchers {
-  type TestType = Either[String, Int]
+  type TestType = ex4.Either[String, Int]
   val someMsg = "some message"
   val oneRightEither: TestType = Right(1)
   val twoRightEither: TestType = Right(2)
@@ -45,14 +45,14 @@ class EitherTest extends AnyFlatSpecLike with Matchers {
 
   behavior of "sequence"
   it should "sequence Right" in {
-    Either.sequence(List(oneRightEither, twoRightEither)) shouldEqual Right(List(1, 2))
+    ex4.Either.sequence(List(oneRightEither, twoRightEither)) shouldEqual Right(List(1, 2))
   }
   it should "sequence Left" in {
-    Either.sequence(List(oneRightEither, leftEither)) shouldEqual leftEither
+    ex4.Either.sequence(List(oneRightEither, leftEither)) shouldEqual leftEither
   }
 
   behavior of "traverse"
   it should "traverse Right" in {
-    Either.traverse(List(1, 2))(Right[String, Int] compose identity[Int]) shouldEqual Right(List(1, 2))
+    ex4.Either.traverse(List(1, 2))(Right[String, Int] compose identity[Int]) shouldEqual Right(List(1, 2))
   }
 }

@@ -1,5 +1,8 @@
 package ex7
 
+import ex4.Option
+import ex4.Option.*
+
 import java.util.concurrent.{Callable, ExecutorService, Future, TimeUnit}
 
 type Par[A] = ExecutorService => Future[A]
@@ -58,8 +61,8 @@ object Par:
       override def isCancelled: Boolean =
         af.isCancelled || bf.isCancelled
 
-      override def isDone: Boolean =
-        cache.isDefined
+      override def isDone: Boolean = true
+//        cache.isDefined
 
       override def get(): C =
         get(Long.MaxValue, TimeUnit.NANOSECONDS)

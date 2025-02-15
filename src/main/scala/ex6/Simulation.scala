@@ -1,4 +1,5 @@
 package ex6
+
 import State.*
 
 enum Input:

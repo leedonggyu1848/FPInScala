@@ -1,9 +1,6 @@
 package ex2
-
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
-
-import scala.Option.when
 
 class SolutionTest extends AnyFlatSpecLike with Matchers {
   def fiboTest: Unit = {

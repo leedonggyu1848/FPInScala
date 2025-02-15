@@ -1,9 +1,9 @@
 package ex4
 
-enum Option[+A]:
-  case Some(get: A)
-  case None extends Option[Nothing]
+case class Some[+A](get: A) extends Option[A]
+case object None extends Option[Nothing]
 
+sealed trait Option[+A]: 
   // 4.1
   def map[B](f: A => B): Option[B] = this match
     case Some(v) => Some(f(v))

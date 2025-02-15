@@ -1,9 +1,8 @@
 package ex3
 
-enum Tree[+A]:
-  case Leaf(value: A)
-  case Branch(left: Tree[A], right: Tree[A])
-
+sealed trait Tree[+A]
+case class Leaf[A](value: A) extends Tree[A]
+case class Branch[A](left: Tree[A], right: Tree[A]) extends Tree[A]
 
 object Tree:
   // ex 3.25
@@ -42,4 +41,4 @@ object Tree:
     fold(t)(_ => 0, (l, r) => 1 + (l max r))
 
   def mapViaFold[A, B](t: Tree[A])(f: A => B): Tree[B] =
-    fold(t)(v => Leaf(f(v)), Branch(_, _))
+    fold(t)(v => Leaf(f(v)): Tree[B], (a, b) => Branch(a, b))

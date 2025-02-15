@@ -1,9 +1,9 @@
 package ex4
 
-enum Either[+E, +A]:
-  case Left(value: E)
-  case Right(value: A)
+case class Left[E](value: E) extends Either[E, Nothing]
+case class Right[A](value: A) extends Either[Nothing, A]
 
+sealed trait Either[+E, +A]:
   // 4.6
   def map[B](f: A => B): Either[E, B] = this match
     case Left(value) => Left(value)

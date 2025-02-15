@@ -2,6 +2,7 @@ package ex8
 
 import ex6.RNG
 import ex6.RNG.{Simple, unit}
+import ex8.Gen
 import ex8.Gen.*
 import org.scalatest.Assertion
 import org.scalatest.flatspec.AnyFlatSpecLike
