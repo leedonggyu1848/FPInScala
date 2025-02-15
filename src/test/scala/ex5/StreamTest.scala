@@ -1,8 +1,5 @@
 package ex5
 
-import ex4.Option
-import ex4.Option.*
-
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 
@@ -140,7 +137,7 @@ class StreamTest extends AnyFlatSpecLike with Matchers {
 
   behavior of "zipAll"
   it should "zip two streams with a given function" in {
-    val add: ((ex4.Option[Int], ex4.Option[Int]), => List[Int]) => List[Int] = (dt, acc) => dt match
+    val add: ((Option[Int], Option[Int]), => List[Int]) => List[Int] = (dt, acc) => dt match
       case (Some(a), Some(b)) => a + b :: acc
       case (None, Some(b)) => b :: acc
       case (Some(a), None) => a :: acc

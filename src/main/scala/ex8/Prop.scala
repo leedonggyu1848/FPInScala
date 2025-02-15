@@ -39,7 +39,7 @@ object Prop:
 
 
   case class Prop(run: (TestCases, RNG) => Result):
-    def check: ex4.Either[(FailedCase, SuccessCount), SuccessCount] = ???
+    def check: Either[(FailedCase, SuccessCount), SuccessCount] = ???
 
     // 8.9
     @targetName("and") def &&(p: Prop): Prop = ???

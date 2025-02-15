@@ -2,7 +2,7 @@ package ex4
 
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
-import ex4.Option.{None, Some}
+import ex4.Option.*
 
 class OptionTest extends AnyFlatSpecLike with Matchers {
   val some: ex4.Option[Int] = Some(10)

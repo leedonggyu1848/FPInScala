@@ -1,7 +1,7 @@
 package ex3
 
 import ex3.Tree
-import ex3.Tree.{Branch, Leaf}
+import ex3.Tree.*
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 

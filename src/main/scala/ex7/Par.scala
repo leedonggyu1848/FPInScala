@@ -1,8 +1,5 @@
 package ex7
 
-import ex4.Option
-import ex4.Option.*
-
 import java.util.concurrent.{Callable, ExecutorService, Future, TimeUnit}
 
 type Par[A] = ExecutorService => Future[A]

@@ -2,10 +2,10 @@ package ex5
 
 import Stream.*
 
-enum Stream[+A]:
-  case Cons(h: () => A, t: () => Stream[A])
-  case Empty extends Stream[Nothing]
+case object Empty extends Stream[Nothing]
+case class Cons[+A](h: () => A, t: () => Stream[A]) extends Stream[A]
 
+sealed trait Stream[+A]:
   def headOption: Option[A] = this match
     case Empty => None
     case Cons(h, _) => Some(h())
